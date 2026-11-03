@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 from alembic import context
 
 # Importar os models registra as tabelas no Base.metadata (necessário p/ autogenerate).
+from crm.modules.auth import models as _auth  # noqa: F401
 from crm.modules.tarefas import models as _tarefas  # noqa: F401
 from crm.modules.visitas import models as _visitas  # noqa: F401
 from crm.shared.config import Settings

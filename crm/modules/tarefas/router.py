@@ -18,7 +18,9 @@ router = APIRouter(prefix="/tarefas", tags=["tarefas"])
 @router.post("", status_code=201)
 @inject
 async def criar(body: NovaTarefa, service: FromDishka[TarefaService]) -> TarefaOut:
-    return await service.criar(body.titulo, body.prazo, body.responsavel_ldap)
+    return await service.criar(
+        body.titulo, body.cpf_cnpj, body.prazo, body.responsavel_ldap
+    )
 
 
 @router.get("")

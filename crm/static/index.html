@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CRM — Tarefas</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header>
+    <h1>CRM</h1>
+    <div id="user" hidden>
+      <span id="user-nome"></span>
+      <button id="btn-logout" class="link">Sair</button>
+    </div>
+  </header>
+
+  <main>
+    <section id="login" hidden>
+      <p>Entre com sua conta corporativa para ver suas tarefas.</p>
+      <a class="btn" href="/auth/login">Entrar</a>
+    </section>
+
+    <section id="app" hidden>
+      <form id="form-nova">
+        <h2>Nova tarefa</h2>
+        <input name="titulo" placeholder="Título" required>
+        <input name="cpf_cnpj" placeholder="CPF/CNPJ do associado" required>
+        <input name="prazo" type="date">
+        <input name="responsavel_ldap" placeholder="Responsável (LDAP) — vazio = eu">
+        <button>Criar</button>
+      </form>
+
+      <nav id="abas">
+        <button data-visao="minhas" class="ativa">Minhas</button>
+        <button data-visao="acompanhando">Acompanhando</button>
+      </nav>
+
+      <ul id="lista"></ul>
+      <p id="vazio" hidden>Nenhuma tarefa.</p>
+    </section>
+
+    <p id="erro" role="alert" hidden></p>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>

@@ -3,7 +3,7 @@ from uuid import UUID
 from dishka.integrations.fastapi import FromDishka, inject
 from fastapi import APIRouter
 
-from crm.clients.ia import RelatoEstruturado
+from crm.modules.visitas.relato import RelatoEstruturado
 from crm.modules.visitas.schemas import NovaVisita, VisitaOut
 from crm.modules.visitas.service import VisitaService
 
@@ -13,7 +13,7 @@ router = APIRouter(prefix="/visitas", tags=["visitas"])
 @router.post("", status_code=201)
 @inject
 async def registrar(body: NovaVisita, service: FromDishka[VisitaService]) -> VisitaOut:
-    return await service.registrar(body.associado_id, body.data, body.relato)
+    return await service.registrar(body.cpf_cnpj, body.data, body.relato)
 
 
 @router.get("")

@@ -8,6 +8,7 @@ from crm.modules.tarefas.models import StatusTarefa
 
 class NovaTarefa(BaseModel):
     titulo: str
+    cpf_cnpj: str
     prazo: date | None = None
     responsavel_ldap: str | None = None  # vazio = para mim; preenchido = já nasce delegada
 
@@ -25,6 +26,7 @@ class TarefaOut(BaseModel):
 
     id: UUID
     titulo: str
+    cpf_cnpj: str
     solicitante_ldap: str
     responsavel_ldap: str
     prazo: date | None

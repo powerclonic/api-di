@@ -19,6 +19,7 @@ class Tarefa(Base):
 
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)  # = sourceExternalId
     titulo: Mapped[str]
+    cpf_cnpj: Mapped[str]  # vira o `suid` no Core
     solicitante_ldap: Mapped[str] = mapped_column(index=True)
     responsavel_ldap: Mapped[str] = mapped_column(index=True)
     prazo: Mapped[date | None]

@@ -4,6 +4,7 @@
 
 from collections.abc import AsyncIterator
 
+import httpx
 from dishka import Provider, Scope, make_async_container, provide
 from dishka.async_container import AsyncContainer
 from dishka.integrations.fastapi import FastapiProvider
@@ -14,13 +15,10 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 
-from crm.clients.core import CoreFake, CoreGateway
-from crm.clients.datalake import DatalakeFake, DatalakeGateway
-from crm.clients.ia import IaFake, IaGateway
-from crm.modules.tarefas.service import TarefaService
-from crm.modules.visitas.service import VisitaService
-from crm.shared.auth import AuthProvider
+from crm.clients.core import CoreAuth, CoreHttp
+from crm.clients.provider import ClientsProvider
 from crm.shared.config import Settings
+from crm.shared.discovery import discover_providers
 
 
 class InfraProvider(Provider):
@@ -37,6 +35,12 @@ class InfraProvider(Provider):
         await engine.dispose()
 
     @provide(scope=Scope.APP)
+    async def core_http(self, settings: Settings) -> AsyncIterator[CoreHttp]:
+        auth = CoreAuth(settings.api_url, settings.api_key, settings.api_secret)
+        async with httpx.AsyncClient(base_url=settings.api_url, auth=auth, timeout=10) as http:
+            yield CoreHttp(http)
+
+    @provide(scope=Scope.APP)
     def session_factory(self, engine: AsyncEngine) -> async_sessionmaker[AsyncSession]:
         return async_sessionmaker(engine, expire_on_commit=False)
 
@@ -48,29 +52,12 @@ class InfraProvider(Provider):
             yield session
 
 
-class ClientsProvider(Provider):
-    """Trocar um sistema externo = trocar UMA linha aqui.
-    Ex.: CoreFake -> CoreApi (ou CoreRpa), IaFake -> IaLangChain."""
-
-    core = provide(CoreFake, provides=CoreGateway, scope=Scope.REQUEST)
-    datalake = provide(DatalakeFake, provides=DatalakeGateway, scope=Scope.REQUEST)
-    ia = provide(IaFake, provides=IaGateway, scope=Scope.APP)
-
-
-class ServicesProvider(Provider):
-    scope = Scope.REQUEST  # dependem do usuário atual e da sessão
-
-    visitas = provide(VisitaService)
-    tarefas = provide(TarefaService)
-
-
 def create_container(*extra_providers: Provider) -> AsyncContainer:
     """`extra_providers` sobrescreve bindings (ex.: um CoreGateway falho em testes)."""
     return make_async_container(
         FastapiProvider(),
-        AuthProvider(),
         InfraProvider(),
         ClientsProvider(),
-        ServicesProvider(),
+        *discover_providers(),  # crm/modules/*/provider.py
         *extra_providers,
     )

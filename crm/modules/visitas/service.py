@@ -1,12 +1,11 @@
 from datetime import date
 from uuid import UUID
 
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from crm.clients.core import CoreGateway
-from crm.clients.ia import IaGateway, RelatoEstruturado
+from crm.modules.visitas.mappers import para_api
 from crm.modules.visitas.models import Visita
+from crm.modules.visitas.relato import RelatoEstruturado
+from crm.modules.visitas.repository import VisitaRepository
 from crm.shared.auth import UsuarioAtual
 from crm.shared.errors import AcessoNegado, NaoEncontrado
 
@@ -14,38 +13,30 @@ from crm.shared.errors import AcessoNegado, NaoEncontrado
 class VisitaService:
     def __init__(
         self,
-        session: AsyncSession,
-        ia: IaGateway,
+        repository: VisitaRepository,
         core: CoreGateway,
         usuario: UsuarioAtual,
     ):
-        self.session = session
-        self.ia = ia
+        self.repository = repository
         self.core = core
         self.usuario = usuario
 
-    async def registrar(self, associado_id: str, data: date, relato_bruto: str) -> Visita:
+    async def registrar(self, cpf_cnpj: str, data: date, relato_bruto: str) -> Visita:
         visita = Visita(
             gerente_ldap=self.usuario.ldap,
-            associado_id=associado_id,
+            cpf_cnpj=cpf_cnpj,
             data=data,
             relato_bruto=relato_bruto,
         )
-        visita.definir_relato(await self.ia.estruturar_relato(relato_bruto))  # -> revisão
-        self.session.add(visita)
-        await self.session.commit()
+        self.repository.adicionar(visita)
+        await self.repository.commit()
         return visita
 
     async def listar(self) -> list[Visita]:
-        consulta = (
-            select(Visita)
-            .where(Visita.gerente_ldap == self.usuario.ldap)
-            .order_by(Visita.data.desc())
-        )
-        return list(await self.session.scalars(consulta))
+        return await self.repository.listar_do_gerente(self.usuario.ldap)
 
     async def obter(self, visita_id: UUID) -> Visita:
-        visita = await self.session.get(Visita, visita_id)
+        visita = await self.repository.obter(visita_id)
         if visita is None:
             raise NaoEncontrado(f"Visita {visita_id} não encontrada")
         if visita.gerente_ldap != self.usuario.ldap:
@@ -55,14 +46,15 @@ class VisitaService:
     async def editar_relato(self, visita_id: UUID, relato: RelatoEstruturado) -> Visita:
         visita = await self.obter(visita_id)
         visita.definir_relato(relato)
-        await self.session.commit()
+        await self.repository.commit()
         return visita
 
     async def confirmar(self, visita_id: UUID) -> Visita:
         visita = await self.obter(visita_id)
         visita.confirmar()
-        # Core antes do commit: se falhar, nada é salvo e o gerente tenta de novo.
-        # O retry é seguro porque o Core recebe o mesmo sourceExternalId.
-        await self.core.registrar_visita(visita)
-        await self.session.commit()
+        # Core antes do commit: se falhar, nada é salvo e o gerente tenta de novo. A API cria e
+        # edita em rotas distintas, então o retry consulta antes (o Core pode já ter recebido).
+        if not await self.core.buscar(source_external_id=str(visita.id)):
+            await self.core.registrar(para_api(visita))
+        await self.repository.commit()
         return visita

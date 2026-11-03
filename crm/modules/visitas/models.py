@@ -5,7 +5,7 @@ from uuid import UUID, uuid4
 from sqlalchemy import JSON, Enum
 from sqlalchemy.orm import Mapped, mapped_column
 
-from crm.clients.ia import RelatoEstruturado
+from crm.modules.visitas.relato import RelatoEstruturado
 from crm.shared.db import Base
 from crm.shared.errors import RegraDeNegocio
 
@@ -21,7 +21,7 @@ class Visita(Base):
 
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)  # = sourceExternalId
     gerente_ldap: Mapped[str] = mapped_column(index=True)
-    associado_id: Mapped[str]
+    cpf_cnpj: Mapped[str]
     data: Mapped[date]
     relato_bruto: Mapped[str]
     relato: Mapped[dict | None] = mapped_column(JSON)  # RelatoEstruturado serializado
