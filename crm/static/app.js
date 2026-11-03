@@ -1,5 +1,6 @@
 const $ = (s) => document.querySelector(s);
 let visao = "minhas";
+let modulo = "tarefas";
 let eu = null;
 
 async function api(path, { method = "GET", body } = {}) {
@@ -82,7 +83,105 @@ async function agir(fn) {
 }
 
 async function carregar() {
-  render(await api(`/tarefas?visao=${visao}`));
+  if (modulo === "visitas") renderVisitas(await api("/visitas"));
+  else render(await api(`/tarefas?visao=${visao}`));
+}
+
+const ROTULO_VISITA = { rascunho: "Rascunho", revisao: "Em revisão", confirmada: "Confirmada" };
+const linhas = (s) => s.split("\n").map((l) => l.trim()).filter(Boolean);
+
+function campo(rotulo, el) {
+  const l = document.createElement("label");
+  l.append(rotulo, el);
+  return l;
+}
+
+function area(valor, rows) {
+  const t = document.createElement("textarea");
+  t.rows = rows;
+  t.value = valor;
+  return t;
+}
+
+function secaoLida(rotulo, itens) {
+  const div = document.createDocumentFragment();
+  if (!itens.length) return div;
+  const h = document.createElement("h3");
+  h.textContent = rotulo;
+  const ul = document.createElement("ul");
+  for (const i of itens) {
+    const li = document.createElement("li");
+    li.textContent = i;
+    ul.append(li);
+  }
+  div.append(h, ul);
+  return div;
+}
+
+function renderVisitas(visitas) {
+  const ul = $("#lista-visitas");
+  ul.replaceChildren();
+  $("#vazio-visitas").hidden = visitas.length > 0;
+  for (const v of visitas) {
+    const li = document.createElement("li");
+
+    const titulo = document.createElement("div");
+    titulo.className = "titulo";
+    titulo.textContent = `Associado ${v.cpf_cnpj} · ${v.data.split("-").reverse().join("/")}`;
+
+    const st = document.createElement("span");
+    st.className = `status ${v.status}`;
+    st.textContent = ROTULO_VISITA[v.status];
+
+    li.append(titulo, st);
+
+    if (v.status === "confirmada") {
+      const lido = document.createElement("div");
+      lido.className = "lido";
+      const p = document.createElement("p");
+      p.textContent = v.relato.resumo;
+      lido.append(p, secaoLida("Pontos de atenção", v.relato.pontos_de_atencao), secaoLida("Próximos passos", v.relato.proximos_passos));
+      li.append(lido);
+    } else {
+      const bruto = document.createElement("div");
+      bruto.className = "relato-bruto";
+      bruto.textContent = v.relato_bruto;
+
+      const r = v.relato;
+      const resumo = area(r ? r.resumo : "", 3);
+      const pontos = area(r ? r.pontos_de_atencao.join("\n") : "", 3);
+      const passos = area(r ? r.proximos_passos.join("\n") : "", 3);
+      const editor = document.createElement("div");
+      editor.className = "editor";
+      editor.append(
+        campo("Resumo", resumo),
+        campo("Pontos de atenção (um por linha)", pontos),
+        campo("Próximos passos (um por linha)", passos),
+      );
+
+      const acoes = document.createElement("div");
+      acoes.className = "acoes";
+      const salvar = document.createElement("button");
+      salvar.textContent = "Salvar relato";
+      const salvarRelato = () => api(`/visitas/${v.id}/relato`, {
+        method: "PUT",
+        body: { resumo: resumo.value.trim(), pontos_de_atencao: linhas(pontos.value), proximos_passos: linhas(passos.value) },
+      });
+      salvar.onclick = () => resumo.value.trim() ? agir(salvarRelato) : erro("Preencha o resumo");
+      acoes.append(salvar);
+      if (v.status === "revisao") {
+        const conf = document.createElement("button");
+        conf.textContent = "Confirmar";
+        conf.onclick = () => {
+          if (!resumo.value.trim()) return erro("Preencha o resumo");
+          agir(async () => { await salvarRelato(); await api(`/visitas/${v.id}/confirmar`, { method: "POST" }); });
+        };
+        acoes.append(conf);
+      }
+      li.append(bruto, editor, acoes);
+    }
+    ul.append(li);
+  }
 }
 
 async function iniciar() {
@@ -109,6 +208,22 @@ $("#abas").onclick = (e) => {
   if (!v) return;
   visao = v;
   document.querySelectorAll("#abas button").forEach((b) => b.classList.toggle("ativa", b === e.target));
+  agir(() => Promise.resolve());
+};
+
+$("#form-visita").onsubmit = (e) => {
+  e.preventDefault();
+  const f = e.target;
+  agir(async () => { await api("/visitas", { method: "POST", body: Object.fromEntries(new FormData(f)) }); f.reset(); });
+};
+
+$("#modulos").onclick = (e) => {
+  const m = e.target.dataset.modulo;
+  if (!m) return;
+  modulo = m;
+  document.querySelectorAll("#modulos button").forEach((b) => b.classList.toggle("ativa", b === e.target));
+  $("#view-tarefas").hidden = m !== "tarefas";
+  $("#view-visitas").hidden = m !== "visitas";
   agir(() => Promise.resolve());
 };
 

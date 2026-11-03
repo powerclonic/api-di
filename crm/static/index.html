@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>CRM — Tarefas</title>
+  <title>CRM</title>
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
@@ -22,6 +22,12 @@
     </section>
 
     <section id="app" hidden>
+      <nav id="modulos">
+        <button data-modulo="tarefas" class="ativa">Tarefas</button>
+        <button data-modulo="visitas">Visitas</button>
+      </nav>
+
+      <div id="view-tarefas">
       <form id="form-nova">
         <h2>Nova tarefa</h2>
         <input name="titulo" placeholder="Título" required>
@@ -38,6 +44,19 @@
 
       <ul id="lista"></ul>
       <p id="vazio" hidden>Nenhuma tarefa.</p>
+      </div>
+
+      <div id="view-visitas" hidden>
+        <form id="form-visita">
+          <h2>Nova visita</h2>
+          <input name="cpf_cnpj" placeholder="CPF/CNPJ do associado" required>
+          <input name="data" type="date" required>
+          <textarea name="relato" placeholder="Relato da visita" rows="4" required></textarea>
+          <button>Registrar</button>
+        </form>
+        <ul id="lista-visitas"></ul>
+        <p id="vazio-visitas" hidden>Nenhuma visita.</p>
+      </div>
     </section>
 
     <p id="erro" role="alert" hidden></p>
