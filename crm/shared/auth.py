@@ -30,3 +30,17 @@ async def protecao_csrf(request: Request) -> None:
     mandar header customizado, e um fetch cross-origin com ele cai no preflight do CORS."""
     if request.method not in {"GET", "HEAD", "OPTIONS"} and not request.headers.get("x-requested-with"):
         raise HTTPException(403, "Header X-Requested-With obrigatório em requisições que alteram estado")
+
+
+async def rota_publica() -> None:
+    """Marcador: `dependencies=[Depends(rota_publica)]` na rota a isenta do login obrigatório."""
+
+
+async def exigir_login(request: Request) -> None:
+    """Dependência GLOBAL do app: toda rota exige sessão, exceto as marcadas com `rota_publica`.
+    Rota nova nasce protegida; esquecer de proteger deixa de ser possível. Roda antes da validação
+    do corpo, então quem não está logado recebe 401 e não 422."""
+    route = request.scope.get("route")
+    if route is not None and any(d.call is rota_publica for d in route.dependant.dependencies):
+        return
+    await request.state.dishka_container.get(UsuarioAtual)  # 401 se não houver sessão válida

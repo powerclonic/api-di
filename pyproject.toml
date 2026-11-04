@@ -21,7 +21,7 @@ dependencies = [
 ]
 
 [dependency-groups]
-dev = ["import-linter>=2.0"]
+dev = ["import-linter>=2.0", "pytest>=8"]
 
 [tool.importlinter]
 root_package = "crm"
@@ -38,3 +38,7 @@ name = "shared e clients não dependem de módulos"
 type = "forbidden"
 source_modules = ["crm.shared", "crm.clients"]
 forbidden_modules = ["crm.modules"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

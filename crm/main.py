@@ -12,7 +12,7 @@ from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from crm.container import create_container
-from crm.shared.auth import protecao_csrf
+from crm.shared.auth import exigir_login, protecao_csrf, rota_publica
 from crm.shared.discovery import discover_routers
 from crm.shared.errors import AcessoNegado, NaoEncontrado, RegraDeNegocio
 
@@ -25,13 +25,13 @@ async def erro_de_negocio(_: Request, exc: Exception) -> JSONResponse:
 
 
 def create_app(*extra_providers: Provider) -> FastAPI:
-    app = FastAPI(title="CRM - MVP", dependencies=[Depends(protecao_csrf)])
+    app = FastAPI(title="CRM - MVP", dependencies=[Depends(protecao_csrf), Depends(exigir_login)])
     for router in discover_routers():
         app.include_router(router)
     for erro in STATUS_POR_ERRO:
         app.add_exception_handler(erro, erro_de_negocio)
 
-    @app.get("/health", tags=["infra"])
+    @app.get("/health", tags=["infra"], dependencies=[Depends(rota_publica)])
     async def health() -> dict[str, str]:
         return {"status": "ok"}
 

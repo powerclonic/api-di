@@ -3,13 +3,13 @@ import time
 
 import jwt
 from dishka.integrations.fastapi import FromDishka, inject
-from fastapi import APIRouter, HTTPException, Request, Response
+from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 
 from crm.clients.entra import EntraGateway, FalhaDeAutenticacao
 from crm.modules.auth.service import SessaoService
-from crm.shared.auth import UsuarioAtual
+from crm.shared.auth import UsuarioAtual, rota_publica
 from crm.shared.config import Settings
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -33,7 +33,7 @@ def _cookie(settings: Settings) -> dict:
     return {"httponly": True, "samesite": "lax", "secure": settings.session_cookie_secure}
 
 
-@router.get("/login")
+@router.get("/login", dependencies=[Depends(rota_publica)])
 @inject
 async def login(entra: FromDishka[EntraGateway], settings: FromDishka[Settings]) -> RedirectResponse:
     state, nonce, verifier = (secrets.token_urlsafe(n) for n in (32, 32, 48))
@@ -47,7 +47,7 @@ async def login(entra: FromDishka[EntraGateway], settings: FromDishka[Settings])
     return resp
 
 
-@router.get("/callback")
+@router.get("/callback", dependencies=[Depends(rota_publica)])
 @inject
 async def callback(
     request: Request,
@@ -93,7 +93,7 @@ async def me(usuario: FromDishka[UsuarioAtual]) -> UsuarioOut:
     )
 
 
-@router.post("/logout")
+@router.post("/logout", dependencies=[Depends(rota_publica)])
 @inject
 async def logout(
     request: Request,
