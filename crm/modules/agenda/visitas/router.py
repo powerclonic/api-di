@@ -3,9 +3,9 @@ from uuid import UUID
 from dishka.integrations.fastapi import FromDishka, inject
 from fastapi import APIRouter
 
-from crm.modules.visitas.relato import RelatoEstruturado
-from crm.modules.visitas.schemas import NovaVisita, VisitaOut
-from crm.modules.visitas.service import VisitaService
+from crm.modules.agenda.visitas.relato import RelatoEstruturado
+from crm.modules.agenda.visitas.schemas import NovaVisita, VisitaOut
+from crm.modules.agenda.visitas.service import VisitaService
 
 router = APIRouter(prefix="/visitas", tags=["visitas"])
 

@@ -58,6 +58,6 @@ def create_container(*extra_providers: Provider) -> AsyncContainer:
         FastapiProvider(),
         InfraProvider(),
         ClientsProvider(),
-        *discover_providers(),  # crm/modules/*/provider.py
+        *discover_providers(),  # crm/modules/**/provider.py
         *extra_providers,
     )

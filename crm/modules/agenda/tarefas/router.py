@@ -4,13 +4,13 @@ from uuid import UUID
 from dishka.integrations.fastapi import FromDishka, inject
 from fastapi import APIRouter
 
-from crm.modules.tarefas.schemas import (
+from crm.modules.agenda.tarefas.schemas import (
     Delegacao,
     MudancaDeStatus,
     NovaTarefa,
     TarefaOut,
 )
-from crm.modules.tarefas.service import TarefaService
+from crm.modules.agenda.tarefas.service import TarefaService
 
 router = APIRouter(prefix="/tarefas", tags=["tarefas"])
 

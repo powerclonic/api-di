@@ -1,7 +1,7 @@
 from dishka import Provider, Scope, provide
 
-from crm.modules.tarefas.repository import TarefaRepository
-from crm.modules.tarefas.service import TarefaService
+from crm.modules.agenda.tarefas.repository import TarefaRepository
+from crm.modules.agenda.tarefas.service import TarefaService
 
 
 class TarefaProvider(Provider):

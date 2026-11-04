@@ -1,7 +1,7 @@
 """sessoes
 
 Revision ID: 116ffa798b92
-Revises: ea05c6356fc9
+Revises: 
 Create Date: 2026-11-03 20:09:04.638846
 
 """
@@ -13,8 +13,8 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision: str = '116ffa798b92'
-down_revision: Union[str, Sequence[str], None] = 'ea05c6356fc9'
-branch_labels: Union[str, Sequence[str], None] = None
+down_revision: Union[str, Sequence[str], None] = None
+branch_labels: Union[str, Sequence[str], None] = ('auth',)
 depends_on: Union[str, Sequence[str], None] = None
 
 

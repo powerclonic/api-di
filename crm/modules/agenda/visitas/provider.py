@@ -1,7 +1,7 @@
 from dishka import Provider, Scope, provide
 
-from crm.modules.visitas.repository import VisitaRepository
-from crm.modules.visitas.service import VisitaService
+from crm.modules.agenda.visitas.repository import VisitaRepository
+from crm.modules.agenda.visitas.service import VisitaService
 
 
 class VisitaProvider(Provider):

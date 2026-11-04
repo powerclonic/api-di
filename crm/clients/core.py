@@ -178,6 +178,5 @@ class CoreHttpx(CoreGateway):
 
     async def _request(self, method: str, **kwargs: Any) -> Any:
         resp = await self.http.request(method, "/tarefas/v1", **kwargs)
-        print(resp.json())
         resp.raise_for_status()
         return resp.json()

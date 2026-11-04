@@ -3,7 +3,7 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from crm.modules.visitas.models import Visita
+from crm.modules.agenda.visitas.models import Visita
 
 
 class VisitaRepository:

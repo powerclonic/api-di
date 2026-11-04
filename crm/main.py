@@ -1,4 +1,4 @@
-"""Rodar:  docker compose up -d && uv run alembic upgrade head && uv run uvicorn crm.main:app --reload
+"""Rodar:  docker compose up -d && uv run alembic upgrade heads && uv run uvicorn crm.main:app --reload
 
 Front: http://localhost:8000/ (login via Entra mock em :8001; ou /auth/login) (Entra mock em :8001). Requisições que alteram estado
 precisam do header X-Requested-With."""
@@ -12,10 +12,8 @@ from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from crm.container import create_container
-from crm.modules.auth.router import router as auth
-from crm.modules.tarefas.router import router as tarefas
-from crm.modules.visitas.router import router as visitas
 from crm.shared.auth import protecao_csrf
+from crm.shared.discovery import discover_routers
 from crm.shared.errors import AcessoNegado, NaoEncontrado, RegraDeNegocio
 
 STATUS_POR_ERRO = {NaoEncontrado: 404, AcessoNegado: 403, RegraDeNegocio: 422}
@@ -28,7 +26,7 @@ async def erro_de_negocio(_: Request, exc: Exception) -> JSONResponse:
 
 def create_app(*extra_providers: Provider) -> FastAPI:
     app = FastAPI(title="CRM - MVP", dependencies=[Depends(protecao_csrf)])
-    for router in (auth, visitas, tarefas):
+    for router in discover_routers():
         app.include_router(router)
     for erro in STATUS_POR_ERRO:
         app.add_exception_handler(erro, erro_de_negocio)

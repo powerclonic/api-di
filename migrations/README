@@ -1,1 +1,24 @@
-Generic single-database configuration with an async dbapi.
+Migrations por módulo: cada módulo é uma branch do Alembic (branch label = nome do módulo) e
+tem a própria pasta em versions/<modulo>/. Uma cadeia linear por módulo evita conflito de
+"multiple heads" entre times; módulos não têm down_revision em comum.
+
+Aplicar tudo:            uv run alembic upgrade heads        (com "head" no singular dá erro)
+Aplicar só um módulo:   uv run alembic upgrade agenda@head
+Estado:                  uv run alembic current / heads
+
+Migration nova num módulo que já existe (autogenerate vê todos os models, então confira o diff):
+  uv run alembic revision --autogenerate -m "descricao" \
+      --head agenda@head --version-path migrations/versions/agenda
+
+Módulo novo (primeira migration cria a branch):
+  mkdir migrations/versions/<modulo>
+  uv run alembic revision --autogenerate -m "descricao" \
+      --head base --branch-label <modulo> --version-path migrations/versions/<modulo>
+
+Regras:
+- Sem FK entre tabelas de módulos diferentes (referencie por id) e sem depends_on entre módulos.
+- Um módulo pode ser revertido sozinho: uv run alembic downgrade agenda@base
+
+Banco criado ANTES desta divisão (alembic_version = a1c3e5f7b9d0 e só isso): rode uma vez
+`uv run alembic stamp heads` para marcar as duas branches; sem isso o upgrade tenta recriar
+as tabelas de auth.

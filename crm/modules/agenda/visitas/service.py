@@ -2,10 +2,10 @@ from datetime import date
 from uuid import UUID
 
 from crm.clients.core import CoreGateway
-from crm.modules.visitas.mappers import para_api
-from crm.modules.visitas.models import Visita
-from crm.modules.visitas.relato import RelatoEstruturado
-from crm.modules.visitas.repository import VisitaRepository
+from crm.modules.agenda.visitas.mappers import para_api
+from crm.modules.agenda.visitas.models import Visita
+from crm.modules.agenda.visitas.relato import RelatoEstruturado
+from crm.modules.agenda.visitas.repository import VisitaRepository
 from crm.shared.auth import UsuarioAtual
 from crm.shared.errors import AcessoNegado, NaoEncontrado
 

@@ -4,7 +4,7 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from crm.modules.tarefas.models import Tarefa
+from crm.modules.agenda.tarefas.models import Tarefa
 
 
 class TarefaRepository:
