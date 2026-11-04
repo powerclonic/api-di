@@ -5,7 +5,7 @@ from uuid import UUID, uuid4
 from sqlalchemy import JSON, Enum
 from sqlalchemy.orm import Mapped, mapped_column
 
-from crm.modules.agenda.visitas.relato import RelatoEstruturado
+from crm.modules.visitas.relato import RelatoEstruturado
 from crm.shared.db import Base
 from crm.shared.errors import RegraDeNegocio
 

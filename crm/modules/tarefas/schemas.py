@@ -3,7 +3,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict
 
-from crm.modules.agenda.tarefas.models import StatusTarefa
+from crm.modules.tarefas.models import StatusTarefa
 
 
 class NovaTarefa(BaseModel):

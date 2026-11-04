@@ -1,10 +1,11 @@
+from datetime import date
 from typing import Literal
 from uuid import UUID
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from crm.modules.agenda.tarefas.models import Tarefa
+from crm.modules.tarefas.models import StatusTarefa, Tarefa
 
 
 class TarefaRepository:
@@ -25,6 +26,19 @@ class TarefaRepository:
         else:
             filtro = (Tarefa.solicitante_ldap == ldap) & (Tarefa.responsavel_ldap != ldap)
         return list(await self.session.scalars(select(Tarefa).where(filtro)))
+
+    async def pendentes_no_periodo(self, ldap: str, inicio: date, fim: date) -> list[Tarefa]:
+        """Tarefas que eu executo, ainda não concluídas, com prazo dentro do período."""
+        consulta = (
+            select(Tarefa)
+            .where(
+                Tarefa.responsavel_ldap == ldap,
+                Tarefa.status != StatusTarefa.CONCLUIDA,
+                Tarefa.prazo.between(inicio, fim),
+            )
+            .order_by(Tarefa.prazo)
+        )
+        return list(await self.session.scalars(consulta))
 
     async def commit(self) -> None:
         await self.session.commit()

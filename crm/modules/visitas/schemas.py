@@ -3,8 +3,8 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict
 
-from crm.modules.agenda.visitas.models import StatusVisita
-from crm.modules.agenda.visitas.relato import RelatoEstruturado
+from crm.modules.visitas.models import StatusVisita
+from crm.modules.visitas.relato import RelatoEstruturado
 
 
 class NovaVisita(BaseModel):

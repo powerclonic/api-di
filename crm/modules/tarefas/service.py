@@ -3,9 +3,9 @@ from typing import Literal
 from uuid import UUID
 
 from crm.clients.core import CoreGateway
-from crm.modules.agenda.tarefas.mappers import para_api, status_para_api
-from crm.modules.agenda.tarefas.models import StatusTarefa, Tarefa
-from crm.modules.agenda.tarefas.repository import TarefaRepository
+from crm.modules.tarefas.mappers import para_api, status_para_api
+from crm.modules.tarefas.models import StatusTarefa, Tarefa
+from crm.modules.tarefas.repository import TarefaRepository
 from crm.shared.auth import UsuarioAtual
 from crm.shared.errors import AcessoNegado, NaoEncontrado
 

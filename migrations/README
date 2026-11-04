@@ -3,12 +3,12 @@ tem a própria pasta em versions/<modulo>/. Uma cadeia linear por módulo evita 
 "multiple heads" entre times; módulos não têm down_revision em comum.
 
 Aplicar tudo:            uv run alembic upgrade heads        (com "head" no singular dá erro)
-Aplicar só um módulo:   uv run alembic upgrade agenda@head
+Aplicar só um módulo:   uv run alembic upgrade tarefas@head
 Estado:                  uv run alembic current / heads
 
 Migration nova num módulo que já existe (autogenerate vê todos os models, então confira o diff):
   uv run alembic revision --autogenerate -m "descricao" \
-      --head agenda@head --version-path migrations/versions/agenda
+      --head tarefas@head --version-path migrations/versions/tarefas
 
 Módulo novo (primeira migration cria a branch):
   mkdir migrations/versions/<modulo>
@@ -17,8 +17,8 @@ Módulo novo (primeira migration cria a branch):
 
 Regras:
 - Sem FK entre tabelas de módulos diferentes (referencie por id) e sem depends_on entre módulos.
-- Um módulo pode ser revertido sozinho: uv run alembic downgrade agenda@base
+- Um módulo pode ser revertido sozinho: uv run alembic downgrade visitas@base
 
-Banco criado ANTES desta divisão (alembic_version = a1c3e5f7b9d0 e só isso): rode uma vez
-`uv run alembic stamp heads` para marcar as duas branches; sem isso o upgrade tenta recriar
-as tabelas de auth.
+Banco criado antes da divisão por módulo (ou antes da branch `visitas`): rode uma vez
+`uv run alembic stamp heads` para marcar todas as branches; sem isso o upgrade tenta recriar
+tabelas que já existem. Branches atuais: auth, tarefas, visitas.

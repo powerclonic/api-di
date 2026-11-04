@@ -1,5 +1,5 @@
 from crm.clients.core import Tarefa as TarefaCore
-from crm.modules.agenda.visitas.models import Visita
+from crm.modules.visitas.models import Visita
 
 
 def para_api(visita: Visita) -> TarefaCore:

@@ -29,14 +29,9 @@ root_package = "crm"
 [[tool.importlinter.contracts]]
 name = "Módulos só se enxergam pelo contracts.py"
 type = "independence"
-modules = ["crm.modules.auth", "crm.modules.agenda"]
+modules = ["crm.modules.*"]
 ignore_imports = ["crm.modules.** -> crm.modules.*.contracts"]
-unmatched_ignore_imports_alerting = "none"  # ainda ninguém consome contracts
-
-[[tool.importlinter.contracts]]
-name = "Submódulos da agenda são independentes"
-type = "independence"
-modules = ["crm.modules.agenda.tarefas", "crm.modules.agenda.visitas"]
+unmatched_ignore_imports_alerting = "none"
 
 [[tool.importlinter.contracts]]
 name = "shared e clients não dependem de módulos"
