@@ -43,7 +43,9 @@ class FakeTarefaRepository:
 class FakeCore:
     """Implementa TarefasGateway e registra as chamadas para os testes inspecionarem."""
 
-    def __init__(self):
+    def __init__(self, *existentes: TarefaCore):
+        self.existentes = list(existentes)  # o que o Core "já tem" para o buscar devolver
+        self.buscas: list[dict] = []
         self.registradas: list[TarefaCore] = []
         self.edicoes: list[tuple[str, str, StatusCore | None, date | None]] = []
 
@@ -51,8 +53,9 @@ class FakeCore:
         self.registradas.append(tarefa)
         return tarefa
 
-    async def buscar(self, **_):
-        return []
+    async def buscar(self, **filtros):
+        self.buscas.append(filtros)
+        return list(self.existentes)
 
     async def editar(self, source_external_id, suid, *, status=None, plan_end=None, description=None):
         self.edicoes.append((source_external_id, suid, status, plan_end))

@@ -3,11 +3,13 @@ from uuid import UUID
 from dishka.integrations.fastapi import FromDishka, inject
 from fastapi import APIRouter
 
+from crm.modules.agencia.permissoes import OPERACAO
 from crm.modules.visitas.relato import RelatoEstruturado
 from crm.modules.visitas.schemas import NovaVisita, VisitaOut
 from crm.modules.visitas.service import VisitaService
+from crm.shared.auth import requer_role
 
-router = APIRouter(prefix="/visitas", tags=["visitas"])
+router = APIRouter(prefix="/visitas", tags=["visitas"], dependencies=[requer_role(*OPERACAO)])
 
 
 @router.post("", status_code=201)

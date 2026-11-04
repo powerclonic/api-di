@@ -25,7 +25,10 @@ async def erro_de_negocio(_: Request, exc: Exception) -> JSONResponse:
 
 
 def create_app(*extra_providers: Provider) -> FastAPI:
-    app = FastAPI(title="CRM - MVP", dependencies=[Depends(protecao_csrf), Depends(exigir_login)])
+    app = FastAPI(
+        title="CRM - MVP",
+        dependencies=[Depends(protecao_csrf), Depends(exigir_login)],
+    )
     for router in discover_routers():
         app.include_router(router)
     for erro in STATUS_POR_ERRO:

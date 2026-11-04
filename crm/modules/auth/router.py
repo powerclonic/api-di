@@ -9,7 +9,7 @@ from pydantic import BaseModel
 
 from crm.clients.entra import EntraGateway, FalhaDeAutenticacao
 from crm.modules.auth.service import SessaoService
-from crm.shared.auth import UsuarioAtual, rota_publica
+from crm.shared.auth import UsuarioAtual, rota_publica, rota_sem_papel
 from crm.shared.config import Settings
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -85,7 +85,7 @@ async def callback(
     return resp
 
 
-@router.get("/me")
+@router.get("/me", dependencies=[Depends(rota_sem_papel)])
 @inject
 async def me(usuario: FromDishka[UsuarioAtual]) -> UsuarioOut:
     return UsuarioOut(

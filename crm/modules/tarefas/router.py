@@ -4,6 +4,7 @@ from uuid import UUID
 from dishka.integrations.fastapi import FromDishka, inject
 from fastapi import APIRouter
 
+from crm.modules.agencia.permissoes import OPERACAO
 from crm.modules.tarefas.schemas import (
     Delegacao,
     MudancaDeStatus,
@@ -11,8 +12,9 @@ from crm.modules.tarefas.schemas import (
     TarefaOut,
 )
 from crm.modules.tarefas.service import TarefaService
+from crm.shared.auth import requer_role
 
-router = APIRouter(prefix="/tarefas", tags=["tarefas"])
+router = APIRouter(prefix="/tarefas", tags=["tarefas"], dependencies=[requer_role(*OPERACAO)])
 
 
 @router.post("", status_code=201)
