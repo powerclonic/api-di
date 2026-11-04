@@ -15,7 +15,7 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 
-from crm.clients.core import CoreAuth, CoreHttp
+from crm.clients.core.http import CoreAuth, CoreHttp
 from crm.clients.provider import ClientsProvider
 from crm.shared.config import Settings
 from crm.shared.discovery import discover_providers
@@ -53,7 +53,7 @@ class InfraProvider(Provider):
 
 
 def create_container(*extra_providers: Provider) -> AsyncContainer:
-    """`extra_providers` sobrescreve bindings (ex.: um CoreGateway falho em testes)."""
+    """`extra_providers` sobrescreve bindings (ex.: um TarefasGateway falho em testes)."""
     return make_async_container(
         FastapiProvider(),
         InfraProvider(),

@@ -2,7 +2,7 @@ from datetime import date
 from typing import Literal
 from uuid import UUID
 
-from crm.clients.core import CoreGateway
+from crm.clients.core.tarefas import TarefasGateway
 from crm.modules.tarefas.mappers import para_api, status_para_api
 from crm.modules.tarefas.models import StatusTarefa, Tarefa
 from crm.modules.tarefas.repository import TarefaRepository
@@ -14,7 +14,7 @@ class TarefaService:
     def __init__(
         self,
         repository: TarefaRepository,
-        core: CoreGateway,
+        core: TarefasGateway,
         usuario: UsuarioAtual,
     ):
         self.repository = repository

@@ -1,4 +1,4 @@
-from crm.clients.core import Tarefa as TarefaCore
+from crm.clients.core.tarefas import Tarefa as TarefaCore
 from crm.modules.visitas.models import Visita
 
 

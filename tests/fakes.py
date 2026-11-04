@@ -3,8 +3,8 @@
 from datetime import date
 from uuid import UUID, uuid4
 
-from crm.clients.core import StatusCore
-from crm.clients.core import Tarefa as TarefaCore
+from crm.clients.core.tarefas import StatusCore
+from crm.clients.core.tarefas import Tarefa as TarefaCore
 from crm.modules.tarefas.models import StatusTarefa, Tarefa
 
 
@@ -41,7 +41,7 @@ class FakeTarefaRepository:
 
 
 class FakeCore:
-    """Implementa CoreGateway e registra as chamadas para os testes inspecionarem."""
+    """Implementa TarefasGateway e registra as chamadas para os testes inspecionarem."""
 
     def __init__(self):
         self.registradas: list[TarefaCore] = []

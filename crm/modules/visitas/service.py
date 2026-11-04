@@ -1,7 +1,7 @@
 from datetime import date
 from uuid import UUID
 
-from crm.clients.core import CoreGateway
+from crm.clients.core.tarefas import TarefasGateway
 from crm.modules.visitas.mappers import para_api
 from crm.modules.visitas.models import Visita
 from crm.modules.visitas.relato import RelatoEstruturado
@@ -14,7 +14,7 @@ class VisitaService:
     def __init__(
         self,
         repository: VisitaRepository,
-        core: CoreGateway,
+        core: TarefasGateway,
         usuario: UsuarioAtual,
     ):
         self.repository = repository

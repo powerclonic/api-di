@@ -4,7 +4,7 @@ from datetime import date
 
 import pytest
 
-from crm.clients.core import StatusCore
+from crm.clients.core.tarefas import StatusCore
 from crm.modules.tarefas.models import StatusTarefa, Tarefa
 from crm.modules.tarefas.service import TarefaService
 from crm.shared.auth import UsuarioAtual

@@ -1,5 +1,5 @@
-from crm.clients.core import StatusCore
-from crm.clients.core import Tarefa as TarefaCore
+from crm.clients.core.tarefas import StatusCore
+from crm.clients.core.tarefas import Tarefa as TarefaCore
 from crm.modules.tarefas.models import StatusTarefa, Tarefa
 
 _STATUS = {
