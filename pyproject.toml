@@ -21,7 +21,11 @@ dependencies = [
 ]
 
 [dependency-groups]
-dev = ["import-linter>=2.0", "pytest>=8"]
+dev = [
+    "import-linter>=2.0",
+    "pytest>=8",
+    "pytest-asyncio>=1.4.1.post1",
+]
 
 [tool.importlinter]
 root_package = "crm"
@@ -41,4 +45,5 @@ forbidden_modules = ["crm.modules"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+asyncio_mode = "auto"
 pythonpath = ["."]
