@@ -21,42 +21,48 @@
       <a class="btn" href="/auth/login">Entrar</a>
     </section>
 
-    <section id="app" hidden>
-      <nav id="modulos">
-        <button data-modulo="tarefas" class="ativa">Tarefas</button>
-        <button data-modulo="visitas">Visitas</button>
-      </nav>
-
-      <div id="view-tarefas">
-      <form id="form-nova">
-        <h2>Nova tarefa</h2>
-        <input name="titulo" placeholder="Título" required>
-        <input name="cpf_cnpj" placeholder="CPF/CNPJ do associado" required>
-        <input name="prazo" type="date">
-        <input name="responsavel_ldap" placeholder="Responsável (LDAP) — vazio = eu">
-        <button>Criar</button>
-      </form>
-
-      <nav id="abas">
-        <button data-visao="minhas" class="ativa">Minhas</button>
-        <button data-visao="acompanhando">Acompanhando</button>
-      </nav>
-
-      <ul id="lista"></ul>
-      <p id="vazio" hidden>Nenhuma tarefa.</p>
-      </div>
-
-      <div id="view-visitas" hidden>
-        <form id="form-visita">
-          <h2>Nova visita</h2>
+    <section id="app" class="grade" hidden>
+      <aside class="painel" id="p-minhas">
+        <h2>Minhas tarefas</h2>
+        <form id="form-nova" class="form">
+          <input name="titulo" placeholder="Nova tarefa" required>
           <input name="cpf_cnpj" placeholder="CPF/CNPJ do associado" required>
-          <input name="data" type="date" required>
-          <textarea name="relato" placeholder="Relato da visita" rows="4" required></textarea>
-          <button>Registrar</button>
+          <div class="linha">
+            <input name="prazo" type="date">
+            <input name="responsavel_ldap" placeholder="Responsável (LDAP)">
+          </div>
+          <button>Criar</button>
         </form>
-        <ul id="lista-visitas"></ul>
-        <p id="vazio-visitas" hidden>Nenhuma visita.</p>
+        <ul id="lista-minhas" class="lista"></ul>
+        <p class="vazio" hidden>Nenhuma tarefa.</p>
+      </aside>
+
+      <div class="centro">
+        <section class="painel" id="p-acomp">
+          <h2>Acompanhando</h2>
+          <ul id="lista-acomp" class="lista"></ul>
+          <p class="vazio" hidden>Nada em acompanhamento.</p>
+        </section>
+
+        <section class="painel" id="p-visitas">
+          <h2>Visitas</h2>
+          <form id="form-visita" class="form">
+            <div class="linha">
+              <input name="cpf_cnpj" placeholder="CPF/CNPJ" required>
+              <input name="data" type="date" required>
+            </div>
+            <textarea name="relato" rows="3" placeholder="Relato da visita" required></textarea>
+            <button>Registrar visita</button>
+          </form>
+          <ul id="lista-visitas" class="lista"></ul>
+          <p class="vazio" hidden>Nenhuma visita.</p>
+        </section>
       </div>
+
+      <aside class="painel stub" id="p-calendario">
+        <h2>Calendário</h2>
+        <p>Em breve.</p>
+      </aside>
     </section>
 
     <p id="erro" role="alert" hidden></p>

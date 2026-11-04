@@ -6,16 +6,11 @@
 body { margin:0; font:15px/1.4 system-ui, sans-serif; background:var(--bg); color:var(--fg); }
 header { display:flex; justify-content:space-between; align-items:center; padding:12px 16px; border-bottom:1px solid var(--bd); background:var(--card); }
 h1 { margin:0; font-size:18px; } h2 { margin:0 0 8px; font-size:15px; }
-main { max-width:720px; margin:0 auto; padding:16px; }
+main { padding:16px; }
 input, select, textarea, button, .btn { font:inherit; padding:8px 10px; border:1px solid var(--bd); border-radius:6px; background:var(--card); color:var(--fg); }
 button, .btn { cursor:pointer; text-decoration:none; display:inline-block; }
 form button, .btn { background:var(--ac); border-color:var(--ac); color:#fff; }
 button.link { border:0; background:none; color:var(--ac); }
-#form-nova, #form-visita { display:grid; gap:8px; padding:12px; background:var(--card); border:1px solid var(--bd); border-radius:8px; margin-bottom:16px; }
-#modulos { display:flex; gap:8px; margin-bottom:16px; }
-#modulos button.ativa { background:var(--ac); border-color:var(--ac); color:#fff; }
-#abas { display:flex; gap:8px; margin-bottom:12px; }
-#abas button.ativa { background:var(--ac); border-color:var(--ac); color:#fff; }
 ul { list-style:none; margin:0; padding:0; display:grid; gap:8px; }
 li { background:var(--card); border:1px solid var(--bd); border-radius:8px; padding:12px; display:grid; gap:6px; }
 li.concluida .titulo { text-decoration:line-through; color:var(--mut); }
@@ -35,3 +30,15 @@ textarea { width:100%; resize:vertical; }
 .lido h3 { margin:6px 0 2px; font-size:13px; color:var(--mut); }
 .lido p, .lido ul { margin:0; }
 .lido li { border:0; padding:0; display:list-item; list-style:disc inside; background:none; }
+
+.grade { display:grid; grid-template-columns:minmax(260px,1fr) minmax(320px,1.6fr) minmax(220px,1fr); gap:16px; height:calc(100vh - 90px); }
+.centro { display:grid; grid-template-rows:1fr 1fr; gap:16px; min-height:0; }
+.painel { background:var(--card); border:1px solid var(--bd); border-radius:8px; padding:12px; overflow-y:auto; min-height:0; }
+.painel li { background:var(--bg); }
+.stub { color:var(--mut); display:grid; align-content:start; }
+.form { display:grid; gap:8px; margin-bottom:12px; }
+.form .linha { display:flex; gap:8px; } .form .linha input { flex:1; min-width:0; }
+textarea { resize:vertical; width:100%; }
+.lista { list-style:none; margin:0; padding:0; display:grid; gap:8px; }
+.vazio { color:var(--mut); }
+@media (max-width:900px) { .grade { grid-template-columns:1fr; height:auto; } .centro { grid-template-rows:auto; } }

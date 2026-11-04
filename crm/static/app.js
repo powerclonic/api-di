@@ -1,5 +1,4 @@
 const $ = (s) => document.querySelector(s);
-let visao = "minhas";
 let modulo = "tarefas";
 let eu = null;
 
@@ -36,55 +35,64 @@ function mostrarLogin() {
 
 const PROXIMO = { aberta: ["em_andamento", "Iniciar"], em_andamento: ["concluida", "Concluir"], concluida: ["aberta", "Reabrir"] };
 const ROTULO = { aberta: "Aberta", em_andamento: "Em andamento", concluida: "Concluída" };
+const dataBR = (d) => d.split("-").reverse().join("/");
 
-function render(tarefas) {
-  const ul = $("#lista");
-  ul.replaceChildren();
-  $("#vazio").hidden = tarefas.length > 0;
-  for (const t of tarefas) {
-    const li = document.createElement("li");
-    li.className = t.status;
-
-    const titulo = document.createElement("div");
-    titulo.className = "titulo";
-    titulo.textContent = t.titulo;
-
-    const meta = document.createElement("div");
-    meta.className = "meta";
-    meta.textContent = [
-      `Associado ${t.cpf_cnpj}`,
-      t.prazo ? `prazo ${t.prazo.split("-").reverse().join("/")}` : "sem prazo",
-      ROTULO[t.status],
-      t.delegada ? `${t.solicitante_ldap} → ${t.responsavel_ldap}` : null,
-    ].filter(Boolean).join(" · ");
-
-    const acoes = document.createElement("div");
-    acoes.className = "acoes";
-    if (visao === "minhas") {
-      const [prox, rotulo] = PROXIMO[t.status];
-      const b = document.createElement("button");
-      b.textContent = rotulo;
-      b.onclick = () => agir(() => api(`/tarefas/${t.id}/status`, { method: "POST", body: { status: prox } }));
-      const ld = document.createElement("input");
-      ld.placeholder = "Delegar para (LDAP)";
-      const bd = document.createElement("button");
-      bd.textContent = "Delegar";
-      bd.onclick = () => ld.value.trim() && agir(() => api(`/tarefas/${t.id}/delegar`, { method: "POST", body: { responsavel_ldap: ld.value.trim() } }));
-      acoes.append(b, ld, bd);
-    }
-    li.append(titulo, meta, acoes);
-    ul.append(li);
+function item(classe, titulo, meta, acoes = []) {
+  const li = document.createElement("li");
+  if (classe) li.className = classe;
+  const t = document.createElement("div");
+  t.className = "titulo";
+  t.textContent = titulo;
+  const m = document.createElement("div");
+  m.className = "meta";
+  m.textContent = meta;
+  li.append(t, m);
+  if (acoes.length) {
+    const a = document.createElement("div");
+    a.className = "acoes";
+    a.append(...acoes);
+    li.append(a);
   }
+  return li;
 }
 
-async function agir(fn) {
-  erro("");
-  try { await fn(); await carregar(); } catch (e) { erro(e.message); }
+function botao(texto, fn) {
+  const b = document.createElement("button");
+  b.textContent = texto;
+  b.onclick = fn;
+  return b;
 }
 
-async function carregar() {
-  if (modulo === "visitas") renderVisitas(await api("/visitas"));
-  else render(await api(`/tarefas?visao=${visao}`));
+function preencher(painel, itens) {
+  const ul = $(`${painel} .lista`);
+  ul.replaceChildren(...itens);
+  $(`${painel} .vazio`).hidden = itens.length > 0;
+}
+
+function metaTarefa(t, delegacao) {
+  return [
+    `Associado ${t.cpf_cnpj}`,
+    t.prazo ? `prazo ${dataBR(t.prazo)}` : "sem prazo",
+    ROTULO[t.status],
+    delegacao ? `${t.solicitante_ldap} → ${t.responsavel_ldap}` : null,
+  ].filter(Boolean).join(" · ");
+}
+
+function renderMinhas(tarefas) {
+  preencher("#p-minhas", tarefas.map((t) => {
+    const [prox, rotulo] = PROXIMO[t.status];
+    const ld = document.createElement("input");
+    ld.placeholder = "Delegar (LDAP)";
+    return item(t.status, t.titulo, metaTarefa(t, t.delegada), [
+      botao(rotulo, () => agir(() => api(`/tarefas/${t.id}/status`, { method: "POST", body: { status: prox } }))),
+      ld,
+      botao("Delegar", () => ld.value.trim() && agir(() => api(`/tarefas/${t.id}/delegar`, { method: "POST", body: { responsavel_ldap: ld.value.trim() } }))),
+    ]);
+  }));
+}
+
+function renderAcompanhando(tarefas) {
+  preencher("#p-acomp", tarefas.map((t) => item(t.status, t.titulo, metaTarefa(t, true))));
 }
 
 const ROTULO_VISITA = { rascunho: "Rascunho", revisao: "Em revisão", confirmada: "Confirmada" };
@@ -119,9 +127,9 @@ function secaoLida(rotulo, itens) {
 }
 
 function renderVisitas(visitas) {
-  const ul = $("#lista-visitas");
+  const ul = $("#p-visitas .lista");
   ul.replaceChildren();
-  $("#vazio-visitas").hidden = visitas.length > 0;
+  $("#p-visitas .vazio").hidden = visitas.length > 0;
   for (const v of visitas) {
     const li = document.createElement("li");
 
@@ -184,6 +192,20 @@ function renderVisitas(visitas) {
   }
 }
 
+async function agir(fn) {
+  erro("");
+  try { await fn(); await carregar(); } catch (e) { erro(e.message); }
+}
+
+async function carregar() {
+  const [minhas, acomp, visitas] = await Promise.all([
+    api("/tarefas?visao=minhas"), api("/tarefas?visao=acompanhando"), api("/visitas"),
+  ]);
+  renderMinhas(minhas);
+  renderAcompanhando(acomp);
+  renderVisitas(visitas);
+}
+
 async function iniciar() {
   try {
     eu = await api("/auth/me");
@@ -203,28 +225,16 @@ $("#form-nova").onsubmit = (e) => {
   agir(async () => { await api("/tarefas", { method: "POST", body }); f.reset(); });
 };
 
-$("#abas").onclick = (e) => {
-  const v = e.target.dataset.visao;
-  if (!v) return;
-  visao = v;
-  document.querySelectorAll("#abas button").forEach((b) => b.classList.toggle("ativa", b === e.target));
-  agir(() => Promise.resolve());
-};
-
 $("#form-visita").onsubmit = (e) => {
   e.preventDefault();
   const f = e.target;
   agir(async () => { await api("/visitas", { method: "POST", body: Object.fromEntries(new FormData(f)) }); f.reset(); });
 };
 
-$("#modulos").onclick = (e) => {
-  const m = e.target.dataset.modulo;
-  if (!m) return;
-  modulo = m;
-  document.querySelectorAll("#modulos button").forEach((b) => b.classList.toggle("ativa", b === e.target));
-  $("#view-tarefas").hidden = m !== "tarefas";
-  $("#view-visitas").hidden = m !== "visitas";
-  agir(() => Promise.resolve());
+$("#form-visita").onsubmit = (e) => {
+  e.preventDefault();
+  const f = e.target;
+  agir(async () => { await api("/visitas", { method: "POST", body: Object.fromEntries(new FormData(f)) }); f.reset(); });
 };
 
 $("#btn-logout").onclick = async () => {
